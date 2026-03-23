@@ -50,7 +50,7 @@ impl AttoCore {
             buffer: vec![String::new()],
             cursor_x: 0,
             cursor_y: 0,
-            mode: Mode::Normal,
+            mode: Mode::Insert,
             command_input: String::new(),
             selection_start: None,
             syntax: SyntaxRules {
