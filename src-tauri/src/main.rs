@@ -1,40 +1,54 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+use serde::Serialize;
 use std::sync::Mutex;
 use tauri::State;
 
 mod core;
-use crate::core::{Actions, AttoCore};
+use crate::core::{ActionEvent, Actions, AttoCore};
 
 struct AttoState {
     core: Mutex<AttoCore>,
 }
 
+#[derive(Serialize)]
+struct AttoSnapshot {
+    buffer: Vec<String>,
+    cursor_x: usize,
+    cursor_y: usize,
+    mode: String,
+    event: String,
+}
+
 #[tauri::command]
-fn atto_action(action: String, payload: Option<String>, state: State<AttoState>) -> Option<String> {
+fn atto_action(action: String, payload: Option<String>, state: State<AttoState>) -> AttoSnapshot {
     let mut atto = state.core.lock().unwrap();
 
-    match action.as_str() {
-        "insert_char" => {
-            if let Some(c) = payload.and_then(|s| s.chars().next()) {
-                atto.apply(Actions::InsertChar(c));
-            }
-            None
-        }
-
-        "move_left" => {
-            atto.apply(Actions::MoveLeft);
-            None
-        }
-
-        "move_right" => {
-            atto.apply(Actions::MoveRight);
-            None
-        }
-
-        "get_buffer" => Some(atto.buffer.join("\n")),
-
+    let parsed = match action.as_str() {
+        "insert_char" => payload
+            .and_then(|s| s.chars().next())
+            .map(Actions::InsertChar),
+        "new_line" => Some(Actions::NewLine),
+        "backspace" => Some(Actions::Backspace),
+        "move_right" => Some(Actions::MoveRight),
+        "move_left" => Some(Actions::MoveLeft),
+        "move_up" => Some(Actions::MoveUp),
+        "move_down" => Some(Actions::MoveDown),
         _ => None,
+    };
+
+    let event = if let Some(action) = parsed {
+        atto.apply(action)
+    } else {
+        ActionEvent::None
+    };
+
+    AttoSnapshot {
+        buffer: atto.buffer.clone(),
+        cursor_x: atto.cursor_x,
+        cursor_y: atto.cursor_y,
+        mode: format!("{:?}", atto.mode),
+        event: "none".to_string(),
     }
 }
 

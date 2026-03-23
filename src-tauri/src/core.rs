@@ -1,5 +1,6 @@
 use std::io;
 
+#[derive(Debug)]
 pub enum Mode {
     Normal,
     Insert,
@@ -35,9 +36,9 @@ pub enum ActionEvent {
 
 pub struct AttoCore {
     pub buffer: Vec<String>,
-    cursor_x: usize,
-    cursor_y: usize,
-    mode: Mode,
+    pub cursor_x: usize,
+    pub cursor_y: usize,
+    pub mode: Mode,
     command_input: String,
     selection_start: Option<(usize, usize)>,
     syntax: SyntaxRules,
