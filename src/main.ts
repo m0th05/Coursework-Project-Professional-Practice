@@ -3,6 +3,10 @@ import { invoke } from "@tauri-apps/api/core";
 window.addEventListener("DOMContentLoaded", () => {
   window.focus();
 
+  document.querySelector("#test")?.addEventListener("click", () => {
+    console.log("Button Clicked");
+  });
+
   setTimeout(() => {
     window.focus();
     console.log("Focused element:", document.activeElement);
