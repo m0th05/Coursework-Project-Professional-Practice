@@ -1,14 +1,26 @@
 import { invoke } from "@tauri-apps/api/core"; //  Calls Rust commands, allowing frontend/backend communication
+import { getCurrentWindow } from "@tauri-apps/api/window";
 
 window.addEventListener("DOMContentLoaded", () => {
   // This section sets up initial event listeners
   window.focus(); // and focuses the window when the DOM is ready.
   //
-  document.querySelector("#test")?.addEventListener("click", () => {
-    // This logs a message when a button with
-    console.log("Button Clicked"); // the ID "test" is clicked.
-  }); //
-  //
+  document.querySelector("#save")?.addEventListener("click", () => {
+    console.log("Save Clicked");
+  });
+
+  document.querySelector("#save-as")?.addEventListener("click", () => {
+    console.log("Save As Clicked");
+  });
+
+  document.querySelector("#load")?.addEventListener("click", () => {
+    console.log("Load Clicked");
+  });
+
+  document.querySelector("#exit")?.addEventListener("click", async () => {
+    await getCurrentWindow().close();
+  });
+
   setTimeout(() => {
     // This part sets logging and focusing
     window.focus(); // to the next event loop tick, ensuring

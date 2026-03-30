@@ -15,6 +15,14 @@ body {
     overflow: auto;
 }
 
+#toolbar {
+    display: flex;
+    gap: 8px;
+    padding: 4px 8px;
+    background-color: #1a1a1a;
+    border-bottom: 1px solid #333;
+}
+
 .cursor {
     display: inline-block;
     height: 1em;
