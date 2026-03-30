@@ -130,6 +130,10 @@ impl AttoCore {
         }
     }
 
+    fn insert_tab(&mut self) {
+        // this is for later when i can actually test this
+    }
+
     pub fn apply(&mut self, action: Actions) -> ActionEvent {
         match action {
             Actions::InsertChar(c) if matches!(self.mode, Mode::Insert) => self.insert_char(c),
@@ -140,6 +144,7 @@ impl AttoCore {
             Actions::MoveRight => self.move_right(),
             Actions::MoveUp => self.move_up(),
             Actions::MoveDown => self.move_down(),
+            //Actions::InsertTab => self.insert_tab(),
 
             Actions::EnterInsert => self.mode = Mode::Insert,
             Actions::ExitInsert => self.mode = Mode::Normal,
