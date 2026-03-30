@@ -34,6 +34,7 @@ fn atto_action(action: String, payload: Option<String>, state: State<AttoState>)
         "move_left" => Some(Actions::MoveLeft),
         "move_up" => Some(Actions::MoveUp),
         "move_down" => Some(Actions::MoveDown),
+        "insert_tab" => Some(Actions::InsertTab),
         _ => None,
     };
 

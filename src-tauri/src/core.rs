@@ -21,6 +21,7 @@ pub enum Actions {
     MoveRight,
     MoveUp,
     MoveDown,
+    InsertTab,
     EnterInsert,
     ExitInsert,
     StartCommand,
@@ -132,6 +133,10 @@ impl AttoCore {
 
     fn insert_tab(&mut self) {
         // this is for later when i can actually test this
+        for _ in 0..4 {
+            self.buffer[self.cursor_y].insert(self.cursor_x, ' ');
+            self.cursor_x += 1;
+        }
     }
 
     pub fn apply(&mut self, action: Actions) -> ActionEvent {
@@ -144,7 +149,7 @@ impl AttoCore {
             Actions::MoveRight => self.move_right(),
             Actions::MoveUp => self.move_up(),
             Actions::MoveDown => self.move_down(),
-            //Actions::InsertTab => self.insert_tab(),
+            Actions::InsertTab => self.insert_tab(),
 
             Actions::EnterInsert => self.mode = Mode::Insert,
             Actions::ExitInsert => self.mode = Mode::Normal,

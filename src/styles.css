@@ -1,3 +1,8 @@
+body {
+    background-color: #111111;
+    margin: 0;
+}
+
 #atto {
     height: 90vh;
     font-family: monospace;
@@ -36,4 +41,21 @@
 #atto::selection {
     background: #4cafef;
     color: #ffffff;
+}
+
+button {
+    background: transparent;
+    color: #ffffff;
+    border: 1px solid #111111;
+    cursor: pointer;
+}
+
+button:hover {
+    background: #ffffff;
+    color: #1e1e1e;
+}
+
+button:active {
+    background: #4cafef;
+    border-color: #4cafef;
 }
