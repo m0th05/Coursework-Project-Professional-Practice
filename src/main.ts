@@ -52,7 +52,11 @@ window.addEventListener("keydown", async (e) => {        // This section does ke
       break;                                             // 
     case "Backspace":                                    // Backspace deletes the character before
       await dispatch("backspace");                       // the cursor.
-      break;                                             // ----------------------
+      break;     
+    // ----------------------
+    // case "Tab":
+    //    await dispatch("tab");
+    //    break;
     case "ArrowRight":                                   // 
       await dispatch("move_right");                      // 
       break;                                             // The arrow keys move
