@@ -60,12 +60,6 @@ impl AttoCore {
         }
     }
 
-    fn save(&mut self) {}
-
-    fn save_as(&mut self) {}
-
-    fn load(&mut self) {}
-
     fn execute_command(&mut self) -> ActionEvent {
         let cmd = self.command_input.trim().to_string();
         self.command_input.clear();

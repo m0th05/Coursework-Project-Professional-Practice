@@ -1,20 +1,36 @@
 import { invoke } from "@tauri-apps/api/core"; //  Calls Rust commands, allowing frontend/backend communication
 import { getCurrentWindow } from "@tauri-apps/api/window";
+import { save } from "@tauri-apps/plugin-dialog";
+import { open } from "@tauri-apps/plugin-dialog";
 
+let currentPath: String | null = null;
 window.addEventListener("DOMContentLoaded", () => {
   // This section sets up initial event listeners
   window.focus(); // and focuses the window when the DOM is ready.
   //
-  document.querySelector("#save")?.addEventListener("click", () => {
-    console.log("Save Clicked");
+  document.querySelector("#save")?.addEventListener("click", async () => {
+    await invoke("save", {
+      path: currentPath,
+      content: state.buffer.join("\n"),
+    });
   });
 
-  document.querySelector("#save-as")?.addEventListener("click", () => {
-    console.log("Save As Clicked");
+  document.querySelector("#save-as")?.addEventListener("click", async () => {
+    const path = await save();
+
+    if (path) {
+      currentPath = path;
+      await invoke("save", { path, content: state.buffer.join("\n") });
+    }
   });
 
-  document.querySelector("#load")?.addEventListener("click", () => {
-    console.log("Load Clicked");
+  document.querySelector("#load")?.addEventListener("click", async () => {
+    const path = await open();
+    if (path) {
+      state = await invoke<AttoSnapshot>("load", { path });
+      currentPath = path;
+      render();
+    }
   });
 
   document.querySelector("#exit")?.addEventListener("click", async () => {
