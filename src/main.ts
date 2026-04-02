@@ -27,7 +27,7 @@ window.addEventListener("DOMContentLoaded", () => {
   document.querySelector("#load")?.addEventListener("click", async () => {
     const path = await open();
     if (path) {
-      state = await invoke<AttoSnapshot>("load", { path });
+      state = await invoke<HadronSnapshot>("load", { path });
       currentPath = path;
       render();
     }
@@ -51,7 +51,7 @@ window.addEventListener("DOMContentLoaded", () => {
   render(); // Initially renders the editor state.
 }); //
 
-interface AttoSnapshot {
+interface HadronSnapshot {
   //
   buffer: string[]; // An array of strings (Each is one line of text).
   cursor_x: number; // Cursor X co-ordinates.
@@ -59,7 +59,7 @@ interface AttoSnapshot {
   mode: string; // Editor mode?
 } //
 
-let state: AttoSnapshot = {
+let state: HadronSnapshot = {
   //
   buffer: [""], // This all holds the
   cursor_x: 0, // current editor
@@ -69,7 +69,7 @@ let state: AttoSnapshot = {
 
 async function dispatch(action: string, payload?: string) {
   // This relays an action to the Rust
-  state = await invoke<AttoSnapshot>("atto_action", {
+  state = await invoke<HadronSnapshot>("hadron_action", {
     // backend via Tauri. It calls the
     action, // "atto_action" command expecting a
     payload: payload ?? null, // response which matches the

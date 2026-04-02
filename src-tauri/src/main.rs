@@ -1,24 +1,21 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use cairo::surface::content;
 use serde::Serialize;
-use std::fs;
 use std::sync::Mutex;
 use tauri::State;
 
 mod core;
-use crate::core::{ActionEvent, Actions, AttoCore};
+use crate::core::{ActionEvent, Actions, HadronCore};
 
-struct AttoState {
-    core: Mutex<AttoCore>,
+struct HadronState {
+    core: Mutex<HadronCore>,
 }
 
 #[derive(Serialize)]
-struct AttoSnapshot {
+struct HadronSnapshot {
     buffer: Vec<String>,
     cursor_x: usize,
     cursor_y: usize,
-    mode: String,
     event: String,
 }
 
@@ -28,7 +25,7 @@ fn save(path: String, content: String) -> Result<(), String> {
 }
 
 #[tauri::command]
-fn load(path: String, state: State<AttoState>) -> Result<AttoSnapshot, String> {
+fn load(path: String, state: State<HadronState>) -> Result<HadronSnapshot, String> {
     let content = std::fs::read_to_string(&path).map_err(|e| e.to_string())?;
     let mut atto = state.core.lock().unwrap();
 
@@ -38,17 +35,20 @@ fn load(path: String, state: State<AttoState>) -> Result<AttoSnapshot, String> {
         content.lines().map(|line| line.to_string()).collect()
     };
 
-    Ok(AttoSnapshot {
+    Ok(HadronSnapshot {
         buffer: atto.buffer.clone(),
         cursor_x: atto.cursor_x,
         cursor_y: atto.cursor_y,
-        mode: format!("{:?}", atto.mode),
         event: "none".to_string(),
     })
 }
 
 #[tauri::command]
-fn atto_action(action: String, payload: Option<String>, state: State<AttoState>) -> AttoSnapshot {
+fn hadron_action(
+    action: String,
+    payload: Option<String>,
+    state: State<HadronState>,
+) -> HadronSnapshot {
     let mut atto = state.core.lock().unwrap();
 
     let parsed = match action.as_str() {
@@ -65,17 +65,16 @@ fn atto_action(action: String, payload: Option<String>, state: State<AttoState>)
         _ => None,
     };
 
-    let event = if let Some(action) = parsed {
+    let _event = if let Some(action) = parsed {
         atto.apply(action)
     } else {
         ActionEvent::None
     };
 
-    AttoSnapshot {
+    HadronSnapshot {
         buffer: atto.buffer.clone(),
         cursor_x: atto.cursor_x,
         cursor_y: atto.cursor_y,
-        mode: format!("{:?}", atto.mode),
         event: "none".to_string(),
     }
 }
@@ -83,10 +82,10 @@ fn atto_action(action: String, payload: Option<String>, state: State<AttoState>)
 fn main() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
-        .manage(AttoState {
-            core: Mutex::new(AttoCore::new()),
+        .manage(HadronState {
+            core: Mutex::new(HadronCore::new()),
         })
-        .invoke_handler(tauri::generate_handler![atto_action, save, load])
+        .invoke_handler(tauri::generate_handler![hadron_action, save, load])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }

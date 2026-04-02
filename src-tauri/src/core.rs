@@ -1,15 +1,4 @@
 #[derive(Debug)]
-pub enum Mode {
-    Normal,
-    Insert,
-    Command,
-}
-
-pub struct SyntaxRules {
-    keywords: Vec<String>,
-    comment_markers: Vec<String>,
-    highlight_numbers: bool,
-}
 
 pub enum Actions {
     InsertChar(char),
@@ -20,56 +9,24 @@ pub enum Actions {
     MoveUp,
     MoveDown,
     InsertTab,
-    EnterInsert,
-    ExitInsert,
-    StartCommand,
-    CommandChar(char),
-    ExecuteCommand,
 }
 
 pub enum ActionEvent {
     None,
-    QuitRequested,
-    SaveRequested,
 }
 
-pub struct AttoCore {
+pub struct HadronCore {
     pub buffer: Vec<String>,
     pub cursor_x: usize,
     pub cursor_y: usize,
-    pub mode: Mode,
-    command_input: String,
-    selection_start: Option<(usize, usize)>,
-    syntax: SyntaxRules,
 }
 
-impl AttoCore {
+impl HadronCore {
     pub fn new() -> Self {
         Self {
             buffer: vec![String::new()],
             cursor_x: 0,
             cursor_y: 0,
-            mode: Mode::Insert,
-            command_input: String::new(),
-            selection_start: None,
-            syntax: SyntaxRules {
-                keywords: vec![],
-                comment_markers: vec![],
-                highlight_numbers: true,
-            },
-        }
-    }
-
-    fn execute_command(&mut self) -> ActionEvent {
-        let cmd = self.command_input.trim().to_string();
-        self.command_input.clear();
-        self.mode = Mode::Normal;
-
-        match cmd.as_str() {
-            "q" | ":q" => ActionEvent::QuitRequested,
-            "w" | ":w" => ActionEvent::SaveRequested,
-            "wq" | ":wq" => ActionEvent::QuitRequested,
-            _ => ActionEvent::None,
         }
     }
 
@@ -139,31 +96,14 @@ impl AttoCore {
 
     pub fn apply(&mut self, action: Actions) -> ActionEvent {
         match action {
-            Actions::InsertChar(c) if matches!(self.mode, Mode::Insert) => self.insert_char(c),
-            Actions::NewLine if matches!(self.mode, Mode::Insert) => self.new_line(),
-
+            Actions::InsertChar(c) => self.insert_char(c),
+            Actions::NewLine => self.new_line(),
             Actions::Backspace => self.backspace(),
             Actions::MoveLeft => self.move_left(),
             Actions::MoveRight => self.move_right(),
             Actions::MoveUp => self.move_up(),
             Actions::MoveDown => self.move_down(),
             Actions::InsertTab => self.insert_tab(),
-
-            Actions::EnterInsert => self.mode = Mode::Insert,
-            Actions::ExitInsert => self.mode = Mode::Normal,
-
-            Actions::StartCommand => {
-                self.mode = Mode::Command;
-                self.command_input.clear();
-            }
-
-            Actions::CommandChar(c) if matches!(self.mode, Mode::Command) => {
-                self.command_input.push(c);
-            }
-
-            Actions::ExecuteCommand => return self.execute_command(),
-
-            _ => {}
         }
 
         ActionEvent::None
